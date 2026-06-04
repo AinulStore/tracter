@@ -1,304 +1,524 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AINULTZY // NEURAL_CORE</title>
+    <title>Ainul Riskian — The Exclusive Archive</title>
     
-    <!-- Advanced Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* === LUXURY VARIABLES === */
         :root {
-            --primary: #00f2fe;
-            --secondary: #4facfe;
-            --alert: #ff0844;
-            --bg-color: #030710;
-            --hud-bg: rgba(3, 7, 16, 0.6);
-            --hud-border: rgba(0, 242, 254, 0.3);
+            --bg-color: #030303; /* Deep OLED Black */
+            --text-main: #f0f0f0;
+            --text-muted: #888888;
+            --gold-light: #FBF5B7;
+            --gold-main: #D4AF37; /* Metallic Gold */
+            --gold-dark: #AA771C;
+            --gold-gradient: linear-gradient(to right, #BF953F, #FCF6BA, #D4AF37, #FBF5B7, #AA771C);
+            --glass-bg: rgba(25, 25, 25, 0.4);
+            --glass-border: rgba(212, 175, 55, 0.15);
         }
 
+        /* === GLOBAL RESET === */
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            user-select: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom elegant cursor */
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--primary);
-            font-family: 'Rajdhani', sans-serif;
-            overflow: hidden; /* No scroll, fixed dashboard */
-            width: 100vw; height: 100vh;
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 1. CANVAS BACKGROUND */
-        canvas {
+        /* === GOLD DUST CANVAS === */
+        #gold-dust {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* === CUSTOM CURSOR === */
+        .luxury-cursor {
+            width: 12px; height: 12px;
+            background: var(--gold-main);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+        .luxury-cursor.hover {
+            width: 40px; height: 40px;
+            background: transparent;
+            border: 1px solid var(--gold-main);
+        }
+
+        /* === LAYOUT & SECTIONS === */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 5vw;
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .avatar-frame {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            padding: 3px;
+            background: var(--gold-gradient);
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: cinematicReveal 1.5s 0.5s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+
+        .avatar-img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--bg-color);
+            filter: grayscale(80%) contrast(120%);
+            transition: filter 0.8s ease;
+        }
+        .avatar-frame:hover .avatar-img {
+            filter: grayscale(0%) contrast(100%);
+        }
+
+        .title-pre {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: cinematicReveal 1.5s 1s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            /* Gold Shimmer Effect */
+            background: var(--gold-gradient);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 5s linear infinite, cinematicReveal 1.5s 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        .hero-desc {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: cinematicReveal 1.5s 1.5s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            animation: cinematicReveal 1.5s 2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+        .scroll-text {
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .scroll-line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, var(--gold-main), transparent);
+            animation: scrollLine 2s infinite;
+        }
+
+        @keyframes scrollLine {
+            0% { transform: scaleY(0); transform-origin: top; }
+            50% { transform: scaleY(1); transform-origin: top; }
+            50.1% { transform: scaleY(1); transform-origin: bottom; }
+            100% { transform: scaleY(0); transform-origin: bottom; }
+        }
+
+        @keyframes cinematicReveal {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === THE ARCHIVES (BIODATA & LINKS) === */
+        .archives {
+            padding: 100px 0;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .section-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--gold-main);
+            margin-bottom: 60px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        /* Plaque Style Cards */
+        .plaque {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 50px 40px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+            overflow: hidden;
+            /* Scroll Reveal Setup */
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .plaque.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .plaque:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            transform: translateY(-5px);
+        }
+
+        .plaque::before {
+            content: '';
             position: absolute;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
+            width: 100%; height: 1px;
+            background: var(--gold-gradient);
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
+        .plaque:hover::before { opacity: 1; }
 
-        /* 2. SCANLINE & VIGNETTE OVERLAY */
-        .overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
-            z-index: 2; pointer-events: none;
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
-        }
-
-        /* 3. MAIN DASHBOARD WRAPPER */
-        .dashboard {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 3; display: grid;
-            grid-template-columns: 280px 1fr 280px;
-            grid-template-rows: 80px 1fr 80px;
-            padding: 20px; gap: 20px;
-        }
-
-        /* HUD PANELS (Cyberpunk Clip-path styling) */
-        .hud-panel {
-            background: var(--hud-bg);
-            border: 1px solid var(--hud-border);
-            backdrop-filter: blur(5px);
-            position: relative;
-            padding: 20px;
-            box-shadow: inset 0 0 20px rgba(0, 242, 254, 0.05);
-        }
-        
-        .hud-panel::before {
-            content: ''; position: absolute; top: -1px; left: -1px;
-            width: 20px; height: 20px;
-            border-top: 2px solid var(--primary);
-            border-left: 2px solid var(--primary);
-        }
-        .hud-panel::after {
-            content: ''; position: absolute; bottom: -1px; right: -1px;
-            width: 20px; height: 20px;
-            border-bottom: 2px solid var(--primary);
-            border-right: 2px solid var(--primary);
-        }
-
-        .panel-title {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem; letter-spacing: 2px;
-            color: rgba(255,255,255,0.7);
+        .plaque-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            border-bottom: 1px solid var(--hud-border);
-            padding-bottom: 5px; margin-bottom: 15px;
-        }
-
-        /* TOP BAR */
-        .top-bar { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; }
-        .sys-warning { color: var(--alert); font-family: 'Share Tech Mono'; animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        /* LEFT PANEL: METRICS & TELEMETRY */
-        .left-panel { grid-column: 1; grid-row: 2 / -1; display: flex; flex-direction: column; gap: 20px; }
-        
-        .metric { margin-bottom: 15px; }
-        .metric-label { font-size: 0.8rem; color: #aaa; font-family: 'Share Tech Mono'; display: flex; justify-content: space-between;}
-        .metric-bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 5px; position: relative;}
-        .metric-bar-fill { height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); transition: width 0.3s;}
-
-        /* CENTER PANEL: CORE IDENTITY */
-        .center-panel {
-            grid-column: 2; grid-row: 2;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            border: none; background: transparent; box-shadow: none;
-        }
-        
-        .core-ring {
-            width: 200px; height: 200px;
-            border-radius: 50%; border: 1px dashed var(--hud-border);
-            position: relative; display: flex; justify-content: center; align-items: center;
-            animation: rotateSpin 20s linear infinite;
+            color: var(--gold-main);
             margin-bottom: 30px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .core-ring::before {
-            content: ''; position: absolute;
-            width: 110%; height: 110%; border-radius: 50%;
-            border: 2px solid transparent; border-top-color: var(--primary); border-bottom-color: var(--secondary);
-            animation: rotateSpin 10s linear infinite reverse;
-        }
-        .core-avatar {
-            width: 140px; height: 140px; border-radius: 50%; object-fit: cover;
-            animation: rotateSpin 20s linear infinite reverse; /* Counter-rotate to stay upright */
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+        .plaque-title::after {
+            content: ''; flex: 1; height: 1px; background: rgba(212, 175, 55, 0.2);
         }
 
-        @keyframes rotateSpin { 100% { transform: rotate(360deg); } }
+        /* Bio Details */
+        .bio-list {
+            list-style: none;
+        }
+        .bio-list li {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .bio-list li:last-child { margin-bottom: 0; }
+        .bio-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .bio-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--text-main);
+        }
 
-        .glitch-name {
-            font-size: 4rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 5px; text-shadow: 0 0 20px var(--primary);
+        /* Exclusive Links */
+        .link-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .luxury-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.4s ease;
             position: relative;
         }
-        .designation {
-            font-family: 'Share Tech Mono'; font-size: 1.2rem; color: #fff;
-            letter-spacing: 3px; margin-top: 10px;
-            background: rgba(0, 242, 254, 0.1); padding: 5px 15px; border: 1px solid var(--primary);
+        .luxury-link:last-child { border-bottom: none; }
+
+        .link-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-style: italic;
+            transition: all 0.4s ease;
+        }
+        .link-icon {
+            font-size: 1rem;
+            color: var(--gold-main);
+            opacity: 0.5;
+            transition: all 0.4s ease;
+            transform: translateX(-10px);
         }
 
-        /* RIGHT PANEL: BIODATA & LINKS */
-        .right-panel { grid-column: 3; grid-row: 2; display: flex; flex-direction: column; gap: 20px; }
-        
-        .bio-data { font-family: 'Share Tech Mono'; font-size: 0.85rem; line-height: 1.8; color: #ddd; }
-        .bio-data span { color: var(--primary); }
-
-        .action-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .hud-btn {
-            background: rgba(0, 242, 254, 0.05); border: 1px solid var(--primary);
-            color: var(--primary); padding: 10px; font-family: 'Share Tech Mono';
-            font-size: 0.9rem; cursor: none; text-align: left;
-            text-transform: uppercase; letter-spacing: 1px;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: 0.3s; text-decoration: none;
-            clip-path: polygon(0 0, 90% 0, 100% 30%, 100% 100%, 10% 100%, 0 70%);
+        .luxury-link:hover .link-name {
+            color: var(--gold-main);
+            transform: translateX(10px);
         }
-        .hud-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
-
-        /* BOTTOM CONSOLE */
-        .bottom-console {
-            grid-column: 2; grid-row: 3;
-            font-family: 'Share Tech Mono'; font-size: 0.8rem; color: #aaa;
-            display: flex; flex-direction: column; justify-content: flex-end;
-            overflow: hidden;
+        .luxury-link:hover .link-icon {
+            opacity: 1;
+            transform: translateX(0);
         }
-        .console-line { margin-bottom: 5px; }
-        .console-line span { color: var(--secondary); }
 
-        /* Custom Audio Element */
+        /* === AUDIO ATMOSPHERE === */
+        .audio-player {
+            position: fixed;
+            bottom: 40px; right: 40px;
+            z-index: 100;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .audio-btn {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(0,0,0,0.5);
+            color: var(--gold-main);
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.4s ease;
+        }
+        .audio-btn:hover {
+            border-color: var(--gold-main);
+            background: var(--gold-main);
+            color: var(--bg-color);
+        }
+        .audio-label {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.4s ease;
+        }
+        .audio-player:hover .audio-label {
+            opacity: 1; transform: translateX(0);
+        }
         audio { display: none; }
 
-        /* RESPONSIVE */
-        @media(max-width: 900px) {
-            .dashboard { display: flex; flex-direction: column; overflow-y: auto; pointer-events: auto;}
-            body { overflow: auto; }
-            .left-panel, .right-panel, .bottom-console { width: 100%; }
-            .center-panel { margin: 40px 0; }
+        /* === FOOTER === */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.03);
+            text-transform: uppercase;
+        }
+        footer span { color: var(--gold-main); }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .gallery-grid { grid-template-columns: 1fr; gap: 30px; }
+            .hero-title { font-size: 2.8rem; }
+            .plaque { padding: 40px 25px; }
+            .audio-player { bottom: 20px; right: 20px; }
+            .luxury-cursor { display: none; } /* Disable custom cursor on mobile */
+            * { cursor: auto; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Neural Network Canvas -->
-    <canvas id="neuralCanvas"></canvas>
-    
-    <!-- Scanline Overlay -->
-    <div class="overlay"></div>
+    <canvas id="gold-dust"></canvas>
 
-    <audio id="bgm" src="https://github.com/Chandra-XD/cn-grabbed-result/raw/main/sound/Soegi%20Bornean%20Asmalibrasi.mp3" loop autoplay></audio>
+    <div class="luxury-cursor" id="cursor"></div>
 
-    <!-- DASHBOARD HUD -->
-    <div class="dashboard">
-        
-        <!-- TOP -->
-        <div class="hud-panel top-bar">
-            <div style="font-family: 'Share Tech Mono';">SYS.CORE.V5 // AINULTZY</div>
-            <div class="sys-warning" id="status-text">SYSTEM ONLINE</div>
-            <div style="font-family: 'Share Tech Mono';" id="clock">00:00:00</div>
+    <audio id="ambient-audio" src="https://github.com/Chandra-XD/cn-grabbed-result/raw/main/sound/Soegi%20Bornean%20Asmalibrasi.mp3" loop autoplay></audio>
+    <div class="audio-player">
+        <div class="audio-label">Atmosphere</div>
+        <div class="audio-btn" id="audio-toggle">
+            <i class="fas fa-play" id="audio-icon"></i>
         </div>
-
-        <!-- LEFT -->
-        <div class="left-panel">
-            <div class="hud-panel">
-                <div class="panel-title">LIVE_TELEMETRY</div>
-                <div class="metric">
-                    <div class="metric-label"><span>CPU_LOAD</span> <span id="cpu-val">0%</span></div>
-                    <div class="metric-bar-bg"><div class="metric-bar-fill" id="cpu-bar" style="width: 0%;"></div></div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label"><span>RAM_USAGE</span> <span id="ram-val">0%</span></div>
-                    <div class="metric-bar-bg"><div class="metric-bar-fill" id="ram-bar" style="width: 0%;"></div></div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label"><span>NET_UPLINK</span> <span id="net-val">0%</span></div>
-                    <div class="metric-bar-bg"><div class="metric-bar-fill" id="net-bar" style="width: 0%;"></div></div>
-                </div>
-            </div>
-
-            <div class="hud-panel" style="flex: 1;">
-                <div class="panel-title">SKILL_MATRIX</div>
-                <div class="bio-data">
-                    > JAVASCRIPT_ES6+ <span>[ACTIVE]</span><br>
-                    > NODE.JS_RUNTIME <span>[ACTIVE]</span><br>
-                    > WHATSAPP_API <span>[MASTERED]</span><br>
-                    > REACT_FRONTEND <span>[STABLE]</span><br>
-                    > PYTHON_ML <span>[LEARNING]</span><br>
-                </div>
-            </div>
-        </div>
-
-        <!-- CENTER -->
-        <div class="hud-panel center-panel">
-            <div class="core-ring">
-                <img src="https://avatars.githubusercontent.com/AinulStore" alt="Ainul" class="core-avatar">
-            </div>
-            <div class="glitch-name" id="cipher-name" data-value="AINUL RISKIAN">-------------</div>
-            <div class="designation">LEAD ENGINEER // NULL_STORE</div>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="right-panel">
-            <div class="hud-panel">
-                <div class="panel-title">ENTITY_DATA</div>
-                <div class="bio-data">
-                    ID_NAME: <span>Ainul Riskian</span><br>
-                    ALIAS: <span>AinulTzy / Null</span><br>
-                    AGE: <span>18 Cycles</span><br>
-                    LOC: <span>Banjarmasin, ID</span><br>
-                    ROLE: <span>Programmer</span><br>
-                    STAT: <span>Single_Entity</span><br>
-                </div>
-            </div>
-
-            <div class="hud-panel">
-                <div class="panel-title">EXTERNAL_LINKS</div>
-                <div class="action-btns">
-                    <!-- GANTI LINK DI SINI -->
-                    <a href="#" target="_blank" class="hud-btn"><span><i class="fab fa-whatsapp"></i> COMM_LINK</span> <i class="fas fa-chevron-right"></i></a>
-                    <a href="#" target="_blank" class="hud-btn"><span><i class="fab fa-instagram"></i> INSTAGRAM</span> <i class="fas fa-chevron-right"></i></a>
-                    <a href="#" target="_blank" class="hud-btn"><span><i class="fab fa-tiktok"></i> TIKTOK_NET</span> <i class="fas fa-chevron-right"></i></a>
-                    <a href="#" target="_blank" class="hud-btn" onclick="document.getElementById('bgm').play()"><span><i class="fas fa-music"></i> PLAY_BGM</span> <i class="fas fa-play"></i></a>
-                </div>
-            </div>
-        </div>
-
-        <!-- BOTTOM CONSOLE -->
-        <div class="bottom-console" id="console-output">
-            <div class="console-line"><span>[SYSTEM]</span> Initializing neural network parameters...</div>
-            <div class="console-line"><span>[SYSTEM]</span> Establishing connection to mainframe...</div>
-            <div class="console-line"><span>[SYSTEM]</span> Awaiting user interaction...</div>
-        </div>
-
     </div>
 
+    <section class="hero">
+        <div class="container" style="display: flex; flex-direction: column; align-items: center;">
+            <div class="avatar-frame">
+                <img src="https://avatars.githubusercontent.com/AinulStore" alt="Ainul Riskian" class="avatar-img">
+            </div>
+            
+            <div class="title-pre">The Architect</div>
+            <h1 class="hero-title">Ainul Riskian</h1>
+            <p class="hero-desc">"Crafting elegant code and exclusive digital experiences. Based in Banjarmasin."</p>
+            
+            <div class="scroll-indicator">
+                <div class="scroll-text">Discover</div>
+                <div class="scroll-line"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="archives">
+        <div class="container">
+            <h2 class="section-header">The Collection</h2>
+            
+            <div class="gallery-grid">
+                
+                <div class="plaque reveal-on-scroll">
+                    <div class="plaque-title">I. Personal Identity</div>
+                    <ul class="bio-list">
+                        <li>
+                            <span class="bio-label">Full Name</span>
+                            <span class="bio-value">Ainul Riskian</span>
+                        </li>
+                        <li>
+                            <span class="bio-label">Moniker</span>
+                            <span class="bio-value">Null</span>
+                        </li>
+                        <li>
+                            <span class="bio-label">Age</span>
+                            <span class="bio-value">18 Years</span>
+                        </li>
+                        <li>
+                            <span class="bio-label">Residence</span>
+                            <span class="bio-value">Banjarmasin, ID</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="plaque reveal-on-scroll">
+                    <div class="plaque-title">II. Vocation & Status</div>
+                    <ul class="bio-list">
+                        <li>
+                            <span class="bio-label">Profession</span>
+                            <span class="bio-value">Software Engineer</span>
+                        </li>
+                        <li>
+                            <span class="bio-label">Specialty</span>
+                            <span class="bio-value">Automation & Web Architecture</span>
+                        </li>
+                        <li>
+                            <span class="bio-label">Leisure</span>
+                            <span class="bio-value">Vocal Arts (Singing)</span>
+                        </li>
+                        <li>
+                            <span class="bio-label">Relationship</span>
+                            <span class="bio-value" style="color: var(--gold-main);">Single & Independent</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="plaque reveal-on-scroll" style="grid-column: 1 / -1; padding: 40px 60px;">
+                    <div class="plaque-title">III. Directories</div>
+                    <div class="link-list">
+                        
+                        <a href="#" target="_blank" class="luxury-link hover-target">
+                            <span class="link-name">Private Correspondence (WhatsApp)</span>
+                            <i class="fab fa-whatsapp link-icon"></i>
+                        </a>
+                        
+                        <a href="#" target="_blank" class="luxury-link hover-target">
+                            <span class="link-name">Visual Portfolio (Instagram)</span>
+                            <i class="fab fa-instagram link-icon"></i>
+                        </a>
+                        
+                        <a href="#" target="_blank" class="luxury-link hover-target">
+                            <span class="link-name">Motion Archives (TikTok)</span>
+                            <i class="fab fa-tiktok link-icon"></i>
+                        </a>
+                        
+                        <a href="#" target="_blank" class="luxury-link hover-target">
+                            <span class="link-name">The Inner Circle (Group)</span>
+                            <i class="fas fa-users link-icon"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 <span>Ainul Riskian</span>. The Exclusive Collection.
+    </footer>
+
     <script>
-        /* ==================================================================
-           1. ADVANCED NEURAL NETWORK CANVAS (Math & Physics Heavy)
-           ================================================================== */
-        const canvas = document.getElementById('neuralCanvas');
+        /* ==========================================
+           1. LUXURY CUSTOM CURSOR
+           ========================================== */
+        const cursor = document.getElementById('cursor');
+        const hoverTargets = document.querySelectorAll('.hover-target, .audio-btn, .avatar-frame');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        hoverTargets.forEach(target => {
+            target.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            target.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        /* ==========================================
+           2. GOLD DUST PARTICLE SYSTEM (CANVAS)
+           ========================================== */
+        const canvas = document.getElementById('gold-dust');
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
-        
-        const mouse = { x: null, y: null, radius: 150 };
-
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
-        });
-
-        window.addEventListener('mouseout', () => {
-            mouse.x = undefined;
-            mouse.y = undefined;
-        });
 
         function resize() {
             width = canvas.width = window.innerWidth;
@@ -308,177 +528,101 @@
         resize();
 
         class Particle {
-            constructor(x, y, vx, vy, size) {
-                this.x = x; this.y = y;
-                this.vx = vx; this.vy = vy;
-                this.size = size;
-                this.baseX = this.x; this.baseY = this.y;
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 1.5 + 0.5; // Very small particles
+                this.speedY = Math.random() * 0.5 + 0.1; // Slow upward drift
+                this.speedX = (Math.random() - 0.5) * 0.3; // Slight sway
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                // Reset when out of screen (top)
+                if (this.y < 0) {
+                    this.y = height;
+                    this.x = Math.random() * width;
+                }
             }
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = '#00f2fe';
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`; // Gold color
                 ctx.fill();
-            }
-            update() {
-                // Constellation movement
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Bounce off edges
-                if(this.x < 0 || this.x > width) this.vx = -this.vx;
-                if(this.y < 0 || this.y > height) this.vy = -this.vy;
-
-                // Mouse interaction (Repulsion Physics)
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < mouse.radius) {
-                    const forceDirectionX = dx / distance;
-                    const forceDirectionY = dy / distance;
-                    const force = (mouse.radius - distance) / mouse.radius;
-                    const directionX = forceDirectionX * force * 5;
-                    const directionY = forceDirectionY * force * 5;
-                    
-                    this.x -= directionX;
-                    this.y -= directionY;
-                }
-                this.draw();
             }
         }
 
         function initParticles() {
             particles = [];
-            let numberOfParticles = (width * height) / 9000; // Density
-            for (let i = 0; i < numberOfParticles; i++) {
-                let size = (Math.random() * 2) + 1;
-                let x = Math.random() * width;
-                let y = Math.random() * height;
-                let vx = (Math.random() - 0.5) * 1;
-                let vy = (Math.random() - 0.5) * 1;
-                particles.push(new Particle(x, y, vx, vy, size));
-            }
-        }
-
-        function connectParticles() {
-            let opacityValue = 1;
-            for (let a = 0; a < particles.length; a++) {
-                for (let b = a; b < particles.length; b++) {
-                    let dx = particles[a].x - particles[b].x;
-                    let dy = particles[a].y - particles[b].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 120) {
-                        opacityValue = 1 - (distance / 120);
-                        ctx.strokeStyle = `rgba(0, 242, 254, ${opacityValue * 0.5})`;
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[a].x, particles[a].y);
-                        ctx.lineTo(particles[b].x, particles[b].y);
-                        ctx.stroke();
-                    }
-                }
+            const particleCount = Math.floor(width / 15); // Not too crowded
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
             }
         }
 
         function animateCanvas() {
-            requestAnimationFrame(animateCanvas);
             ctx.clearRect(0, 0, width, height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-            }
-            connectParticles();
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
         }
 
         initParticles();
         animateCanvas();
 
-        /* ==================================================================
-           2. HACKER CIPHER TEXT DECRYPTION EFFECT
-           ================================================================== */
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-        let targetElement = document.getElementById("cipher-name");
+        /* ==========================================
+           3. CINEMATIC SCROLL REVEAL (Intersection Observer)
+           ========================================== */
+        const revealElements = document.querySelectorAll('.reveal-on-scroll');
         
-        targetElement.onmouseover = event => {
-            let iterations = 0;
-            const interval = setInterval(() => {
-                event.target.innerText = event.target.innerText.split("")
-                .map((letter, index) => {
-                    if(index < iterations) return event.target.dataset.value[index];
-                    return letters[Math.floor(Math.random() * 42)]
-                }).join("");
-                
-                if(iterations >= event.target.dataset.value.length) clearInterval(interval);
-                iterations += 1 / 3;
-            }, 30);
-        }
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
 
-        // Auto trigger on load
-        setTimeout(() => {
-            let event = new MouseEvent('mouseover');
-            targetElement.dispatchEvent(event);
-        }, 1000);
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('reveal');
+                observer.unobserve(entry.target); // Only animate once
+            });
+        }, revealOptions);
 
-        /* ==================================================================
-           3. FAKE LIVE TELEMETRY & CLOCK
-           ================================================================== */
-        function updateTelemetry() {
-            // CPU
-            let cpu = Math.floor(Math.random() * 30) + 20; // 20-50%
-            if(Math.random() > 0.9) cpu += 40; // Random spike
-            document.getElementById('cpu-val').innerText = cpu + '%';
-            document.getElementById('cpu-bar').style.width = cpu + '%';
-            document.getElementById('cpu-bar').style.background = cpu > 80 ? 'var(--alert)' : 'var(--primary)';
+        revealElements.forEach(el => revealOnScroll.observe(el));
 
-            // RAM
-            let ram = Math.floor(Math.random() * 10) + 60; // 60-70%
-            document.getElementById('ram-val').innerText = ram + '%';
-            document.getElementById('ram-bar').style.width = ram + '%';
+        /* ==========================================
+           4. AUDIO CONTROLLER
+           ========================================== */
+        const audio = document.getElementById('ambient-audio');
+        const audioBtn = document.getElementById('audio-toggle');
+        const audioIcon = document.getElementById('audio-icon');
 
-            // NET
-            let net = Math.floor(Math.random() * 100);
-            document.getElementById('net-val').innerText = net + ' Mbps';
-            document.getElementById('net-bar').style.width = net + '%';
-        }
-        setInterval(updateTelemetry, 1500);
-
-        // CLOCK
-        setInterval(() => {
-            let d = new Date();
-            document.getElementById('clock').innerText = 
-                ("0" + d.getHours()).slice(-2) + ":" + 
-                ("0" + d.getMinutes()).slice(-2) + ":" + 
-                ("0" + d.getSeconds()).slice(-2);
-        }, 1000);
-
-        /* ==================================================================
-           4. FAKE CONSOLE LOGGING
-           ================================================================== */
-        const consoleMsgs = [
-            "Compiling WebAssembly modules...",
-            "Decrypting payload [AinulTzy_Data]...",
-            "Bypassing proxy server...",
-            "Ping node 192.168.1.1: SUCCESS",
-            "Audio engine initialized.",
-            "Visual render at 60fps.",
-            "Awaiting command input..."
-        ];
-        let consoleBox = document.getElementById("console-output");
-        
-        let msgIndex = 0;
-        setInterval(() => {
-            if(Math.random() > 0.6) {
-                let msg = consoleMsgs[Math.floor(Math.random() * consoleMsgs.length)];
-                let id = Math.floor(Math.random() * 9999);
-                consoleBox.innerHTML += `<div class="console-line"><span>[SYS_${id}]</span> ${msg}</div>`;
-                
-                // Keep only last 4 lines
-                if(consoleBox.children.length > 4) {
-                    consoleBox.removeChild(consoleBox.firstChild);
-                }
+        // Autoplay policy workaround
+        document.body.addEventListener('click', () => {
+            if (audio.paused && !audioBtn.classList.contains('user-paused')) {
+                audio.play();
+                audioIcon.classList.remove('fa-play');
+                audioIcon.classList.add('fa-pause');
             }
-        }, 2000);
+        }, { once: true });
+
+        audioBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (audio.paused) {
+                audio.play();
+                audioIcon.classList.remove('fa-play');
+                audioIcon.classList.add('fa-pause');
+                audioBtn.classList.remove('user-paused');
+            } else {
+                audio.pause();
+                audioIcon.classList.remove('fa-pause');
+                audioIcon.classList.add('fa-play');
+                audioBtn.classList.add('user-paused'); // Remember user specifically paused it
+            }
+        });
 
     </script>
 </body>
