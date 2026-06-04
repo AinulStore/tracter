@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ainul Riskian — The Exclusive Archive</title>
     
+    <!-- Luxury Font Pairing -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -381,11 +382,15 @@
 </head>
 <body>
 
+    <!-- Subtle Gold Dust Background -->
     <canvas id="gold-dust"></canvas>
 
+    <!-- Custom Cursor -->
     <div class="luxury-cursor" id="cursor"></div>
 
-    <audio id="ambient-audio" src="https://github.com/Chandra-XD/cn-grabbed-result/raw/main/sound/Soegi%20Bornean%20Asmalibrasi.mp3" loop autoplay></audio>
+    <!-- Background Music (Link Lagu Soegi Bornean Kamu) -->
+    <audio id="ambient-audio" src="https://github.com/Chandra-XD/cn-grabbed-result/raw/main/sound/Soegi%20Bornean%20Asmalibrasi.mp3" loop></audio>
+    
     <div class="audio-player">
         <div class="audio-label">Atmosphere</div>
         <div class="audio-btn" id="audio-toggle">
@@ -393,6 +398,7 @@
         </div>
     </div>
 
+    <!-- HERO SECTION -->
     <section class="hero">
         <div class="container" style="display: flex; flex-direction: column; align-items: center;">
             <div class="avatar-frame">
@@ -410,12 +416,14 @@
         </div>
     </section>
 
+    <!-- ARCHIVES (CONTENT) SECTION -->
     <section class="archives">
         <div class="container">
             <h2 class="section-header">The Collection</h2>
             
             <div class="gallery-grid">
                 
+                <!-- Plaque 1: Identity -->
                 <div class="plaque reveal-on-scroll">
                     <div class="plaque-title">I. Personal Identity</div>
                     <ul class="bio-list">
@@ -438,6 +446,7 @@
                     </ul>
                 </div>
 
+                <!-- Plaque 2: Profession -->
                 <div class="plaque reveal-on-scroll">
                     <div class="plaque-title">II. Vocation & Status</div>
                     <ul class="bio-list">
@@ -460,26 +469,31 @@
                     </ul>
                 </div>
 
+                <!-- Plaque 3: External Links (Full Width) -->
                 <div class="plaque reveal-on-scroll" style="grid-column: 1 / -1; padding: 40px 60px;">
                     <div class="plaque-title">III. Directories</div>
                     <div class="link-list">
                         
-                        <a href="#" target="_blank" class="luxury-link hover-target">
+                        <!-- LINK WHATSAPP AINUL -->
+                        <a href="https://api.whatsapp.com/send?phone=6285754202785" target="_blank" class="luxury-link hover-target">
                             <span class="link-name">Private Correspondence (WhatsApp)</span>
                             <i class="fab fa-whatsapp link-icon"></i>
                         </a>
                         
-                        <a href="#" target="_blank" class="luxury-link hover-target">
+                        <!-- LINK INSTAGRAM AINULZYN -->
+                        <a href="https://www.instagram.com/AinulZyn" target="_blank" class="luxury-link hover-target">
                             <span class="link-name">Visual Portfolio (Instagram)</span>
                             <i class="fab fa-instagram link-icon"></i>
                         </a>
                         
-                        <a href="#" target="_blank" class="luxury-link hover-target">
+                        <!-- LINK TIKTOK STORE -->
+                        <a href="https://www.tiktok.com/@nullstore.id?_r=1&_t=ZS-96tYpcAFGJI" target="_blank" class="luxury-link hover-target">
                             <span class="link-name">Motion Archives (TikTok)</span>
                             <i class="fab fa-tiktok link-icon"></i>
                         </a>
                         
-                        <a href="#" target="_blank" class="luxury-link hover-target">
+                        <!-- LINK GRUP AINUL BOT -->
+                        <a href="https://chat.whatsapp.com/HW2heEhEiw1LX8DIEsdd6O" target="_blank" class="luxury-link hover-target">
                             <span class="link-name">The Inner Circle (Group)</span>
                             <i class="fas fa-users link-icon"></i>
                         </a>
@@ -531,15 +545,14 @@
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.size = Math.random() * 1.5 + 0.5; // Very small particles
-                this.speedY = Math.random() * 0.5 + 0.1; // Slow upward drift
-                this.speedX = (Math.random() - 0.5) * 0.3; // Slight sway
+                this.size = Math.random() * 1.5 + 0.5; 
+                this.speedY = Math.random() * 0.5 + 0.1; 
+                this.speedX = (Math.random() - 0.5) * 0.3; 
                 this.opacity = Math.random() * 0.5 + 0.1;
             }
             update() {
                 this.y -= this.speedY;
                 this.x += this.speedX;
-                // Reset when out of screen (top)
                 if (this.y < 0) {
                     this.y = height;
                     this.x = Math.random() * width;
@@ -548,14 +561,14 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`; // Gold color
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
                 ctx.fill();
             }
         }
 
         function initParticles() {
             particles = [];
-            const particleCount = Math.floor(width / 15); // Not too crowded
+            const particleCount = Math.floor(width / 15); 
             for (let i = 0; i < particleCount; i++) {
                 particles.push(new Particle());
             }
@@ -574,7 +587,7 @@
         animateCanvas();
 
         /* ==========================================
-           3. CINEMATIC SCROLL REVEAL (Intersection Observer)
+           3. CINEMATIC SCROLL REVEAL (Observer)
            ========================================== */
         const revealElements = document.querySelectorAll('.reveal-on-scroll');
         
@@ -587,20 +600,35 @@
             entries.forEach(entry => {
                 if (!entry.isIntersecting) return;
                 entry.target.classList.add('reveal');
-                observer.unobserve(entry.target); // Only animate once
+                observer.unobserve(entry.target);
             });
         }, revealOptions);
 
         revealElements.forEach(el => revealOnScroll.observe(el));
 
         /* ==========================================
-           4. AUDIO CONTROLLER
+           4. AUDIO CONTROLLER & 3 SECONDS AUTOPLAY
            ========================================== */
         const audio = document.getElementById('ambient-audio');
         const audioBtn = document.getElementById('audio-toggle');
         const audioIcon = document.getElementById('audio-icon');
 
-        // Autoplay policy workaround
+        // FITUR OTOMATIS NYALA DETIK KE-3
+        setTimeout(() => {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Kalau browser mengizinkan autoplay
+                    audioIcon.classList.remove('fa-play');
+                    audioIcon.classList.add('fa-pause');
+                }).catch((error) => {
+                    // Kalau browser memblokir (butuh diklik dulu sama user)
+                    console.log("Browser memblokir autoplay otomatis. Harap klik layar untuk menyalakan lagu.");
+                });
+            }
+        }, 3000);
+
+        // Kalau autoplay keblokir browser, lagu nyala pas user nge-klik dimanapun di layar
         document.body.addEventListener('click', () => {
             if (audio.paused && !audioBtn.classList.contains('user-paused')) {
                 audio.play();
@@ -609,6 +637,7 @@
             }
         }, { once: true });
 
+        // Tombol manual On/Off
         audioBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (audio.paused) {
@@ -620,7 +649,7 @@
                 audio.pause();
                 audioIcon.classList.remove('fa-pause');
                 audioIcon.classList.add('fa-play');
-                audioBtn.classList.add('user-paused'); // Remember user specifically paused it
+                audioBtn.classList.add('user-paused');
             }
         });
 
