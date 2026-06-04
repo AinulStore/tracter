@@ -1,555 +1,484 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ainul Riskian | Premium Portfolio</title>
+    <title>AINULTZY // NEURAL_CORE</title>
     
-    <!-- Ultra Premium Fonts: Plus Jakarta Sans & Outfit -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Advanced Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* === GLOBAL RESET & VARIABLES === */
         :root {
-            --bg-color: #050505;
-            --surface-color: rgba(255, 255, 255, 0.03);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-primary: #ffffff;
-            --text-secondary: #8a8a93;
-            --accent: #ffffff;
-            --radius-lg: 32px;
-            --radius-md: 24px;
-            --radius-sm: 16px;
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --alert: #ff0844;
+            --bg-color: #030710;
+            --hud-bg: rgba(3, 7, 16, 0.6);
+            --hud-border: rgba(0, 242, 254, 0.3);
         }
 
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            cursor: none; /* Hide default cursor for custom one */
+            margin: 0; padding: 0; box-sizing: border-box;
+            user-select: none;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            color: var(--primary);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden; /* No scroll, fixed dashboard */
+            width: 100vw; height: 100vh;
         }
 
-        /* === MESH GRADIENT BACKGROUND === */
-        .mesh-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1;
-            background-color: #000;
-            overflow: hidden;
-        }
-        .blob {
+        /* 1. CANVAS BACKGROUND */
+        canvas {
             position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.6;
-            animation: moveBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .blob-1 { width: 600px; height: 600px; background: #1a365d; top: -200px; left: -100px; }
-        .blob-2 { width: 500px; height: 500px; background: #2d3748; bottom: -100px; right: -100px; animation-delay: -5s; }
-        .blob-3 { width: 400px; height: 400px; background: #0f4c75; top: 30%; left: 40%; animation-delay: -10s; }
-
-        @keyframes moveBlob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, 150px) scale(1.2); }
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
         }
 
-        /* === CUSTOM CURSOR === */
-        .cursor-dot {
-            width: 8px; height: 8px;
-            background-color: var(--accent);
-            position: fixed; top: 0; left: 0;
-            border-radius: 50%; z-index: 9999;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-        }
-        .cursor-outline {
-            width: 40px; height: 40px;
-            border: 1px solid rgba(255,255,255,0.5);
-            position: fixed; top: 0; left: 0;
-            border-radius: 50%; z-index: 9998;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        /* 2. SCANLINE & VIGNETTE OVERLAY */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 2; pointer-events: none;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
         }
 
-        /* === LOADER === */
-        .loader-wrapper {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--bg-color); z-index: 10000;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-        .loader-content {
-            font-family: 'Outfit', sans-serif;
-            font-size: 3rem; font-weight: 700;
-            color: var(--text-primary);
+        /* 3. MAIN DASHBOARD WRAPPER */
+        .dashboard {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3; display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            grid-template-rows: 80px 1fr 80px;
+            padding: 20px; gap: 20px;
         }
 
-        /* === MAIN CONTAINER & BENTO GRID === */
-        main {
-            padding: 5vh 5vw;
-            max-width: 1200px;
-            margin: 0 auto;
-            opacity: 0;
-            transform: translateY(40px);
-            animation: revealMain 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            animation-delay: 2s;
-        }
-
-        @keyframes revealMain {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-auto-rows: 200px;
-            gap: 24px;
-        }
-
-        /* BENTO CARDS BASE */
-        .bento-card {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            display: flex;
-            flex-direction: column;
+        /* HUD PANELS (Cyberpunk Clip-path styling) */
+        .hud-panel {
+            background: var(--hud-bg);
+            border: 1px solid var(--hud-border);
+            backdrop-filter: blur(5px);
             position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            transition: var(--transition);
+            padding: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 242, 254, 0.05);
         }
-
-        .bento-card:hover {
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        /* GRID SIZES */
-        .span-2x2 { grid-column: span 2; grid-row: span 2; }
-        .span-2x1 { grid-column: span 2; grid-row: span 1; }
-        .span-1x1 { grid-column: span 1; grid-row: span 1; }
-        .span-4x05 { grid-column: span 4; grid-row: span 1; height: 100px; }
-
-        /* === CARD 1: PROFILE HERO === */
-        .hero-card {
-            justify-content: space-between;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-        }
-        .hero-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
-        }
-        .hero-avatar {
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        .status-badge {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 16px; border-radius: 20px;
-            font-size: 0.85rem; font-weight: 500;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .status-dot {
-            width: 8px; height: 8px; background: #4ADE80;
-            border-radius: 50%; box-shadow: 0 0 10px #4ADE80;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
         
-        .hero-content h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 2.5rem; font-weight: 600; line-height: 1.1;
-            margin-bottom: 8px;
+        .hud-panel::before {
+            content: ''; position: absolute; top: -1px; left: -1px;
+            width: 20px; height: 20px;
+            border-top: 2px solid var(--primary);
+            border-left: 2px solid var(--primary);
         }
-        .hero-content p {
-            color: var(--text-secondary); font-size: 1.1rem;
+        .hud-panel::after {
+            content: ''; position: absolute; bottom: -1px; right: -1px;
+            width: 20px; height: 20px;
+            border-bottom: 2px solid var(--primary);
+            border-right: 2px solid var(--primary);
         }
 
-        /* === CARD 2: DYNAMIC INFO === */
-        .info-card { justify-content: center; align-items: flex-start; }
-        .info-card h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 5px; font-weight: 500;}
-        .info-card h2 { font-size: 1.8rem; font-family: 'Outfit'; font-weight: 500; }
+        .panel-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem; letter-spacing: 2px;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--hud-border);
+            padding-bottom: 5px; margin-bottom: 15px;
+        }
 
-        /* === CARD 3: SOCIAL LINKS === */
-        .social-card {
-            justify-content: center; align-items: center;
-            text-decoration: none; color: white;
-            font-size: 3rem;
+        /* TOP BAR */
+        .top-bar { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; }
+        .sys-warning { color: var(--alert); font-family: 'Share Tech Mono'; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* LEFT PANEL: METRICS & TELEMETRY */
+        .left-panel { grid-column: 1; grid-row: 2 / -1; display: flex; flex-direction: column; gap: 20px; }
+        
+        .metric { margin-bottom: 15px; }
+        .metric-label { font-size: 0.8rem; color: #aaa; font-family: 'Share Tech Mono'; display: flex; justify-content: space-between;}
+        .metric-bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 5px; position: relative;}
+        .metric-bar-fill { height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); transition: width 0.3s;}
+
+        /* CENTER PANEL: CORE IDENTITY */
+        .center-panel {
+            grid-column: 2; grid-row: 2;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border: none; background: transparent; box-shadow: none;
+        }
+        
+        .core-ring {
+            width: 200px; height: 200px;
+            border-radius: 50%; border: 1px dashed var(--hud-border);
+            position: relative; display: flex; justify-content: center; align-items: center;
+            animation: rotateSpin 20s linear infinite;
+            margin-bottom: 30px;
+        }
+        .core-ring::before {
+            content: ''; position: absolute;
+            width: 110%; height: 110%; border-radius: 50%;
+            border: 2px solid transparent; border-top-color: var(--primary); border-bottom-color: var(--secondary);
+            animation: rotateSpin 10s linear infinite reverse;
+        }
+        .core-avatar {
+            width: 140px; height: 140px; border-radius: 50%; object-fit: cover;
+            animation: rotateSpin 20s linear infinite reverse; /* Counter-rotate to stay upright */
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+        }
+
+        @keyframes rotateSpin { 100% { transform: rotate(360deg); } }
+
+        .glitch-name {
+            font-size: 4rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 5px; text-shadow: 0 0 20px var(--primary);
             position: relative;
+        }
+        .designation {
+            font-family: 'Share Tech Mono'; font-size: 1.2rem; color: #fff;
+            letter-spacing: 3px; margin-top: 10px;
+            background: rgba(0, 242, 254, 0.1); padding: 5px 15px; border: 1px solid var(--primary);
+        }
+
+        /* RIGHT PANEL: BIODATA & LINKS */
+        .right-panel { grid-column: 3; grid-row: 2; display: flex; flex-direction: column; gap: 20px; }
+        
+        .bio-data { font-family: 'Share Tech Mono'; font-size: 0.85rem; line-height: 1.8; color: #ddd; }
+        .bio-data span { color: var(--primary); }
+
+        .action-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .hud-btn {
+            background: rgba(0, 242, 254, 0.05); border: 1px solid var(--primary);
+            color: var(--primary); padding: 10px; font-family: 'Share Tech Mono';
+            font-size: 0.9rem; cursor: none; text-align: left;
+            text-transform: uppercase; letter-spacing: 1px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s; text-decoration: none;
+            clip-path: polygon(0 0, 90% 0, 100% 30%, 100% 100%, 10% 100%, 0 70%);
+        }
+        .hud-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+
+        /* BOTTOM CONSOLE */
+        .bottom-console {
+            grid-column: 2; grid-row: 3;
+            font-family: 'Share Tech Mono'; font-size: 0.8rem; color: #aaa;
+            display: flex; flex-direction: column; justify-content: flex-end;
             overflow: hidden;
         }
-        .social-card i { z-index: 2; transition: var(--transition); }
-        .social-card .social-name {
-            font-size: 1rem; font-weight: 600; margin-top: 10px;
-            opacity: 0; transform: translateY(20px); transition: var(--transition); z-index: 2;
-        }
-        .social-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
-            opacity: 0; transition: var(--transition);
-        }
-        .social-card:hover i { transform: translateY(-10px); }
-        .social-card:hover .social-name { opacity: 1; transform: translateY(0); }
-        .social-card:hover::before { opacity: 1; }
+        .console-line { margin-bottom: 5px; }
+        .console-line span { color: var(--secondary); }
 
-        /* === CARD 4: ABOUT ME / BIO === */
-        .bio-card { padding: 40px; }
-        .bio-title { font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 20px; font-weight: 600;}
-        .bio-text { color: var(--text-secondary); line-height: 1.7; font-size: 1.05rem; margin-bottom: 20px;}
-        .bio-grid-info {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-            font-size: 0.95rem;
-        }
-        .bio-item { display: flex; flex-direction: column; }
-        .bio-label { color: #555; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;}
-        .bio-value { font-weight: 500; }
+        /* Custom Audio Element */
+        audio { display: none; }
 
-        /* === CARD 5: AUDIO PLAYER === */
-        .audio-card {
-            display: flex; flex-direction: row; align-items: center; justify-content: space-between;
-            padding: 30px;
-        }
-        .vinyl-container {
-            width: 120px; height: 120px; border-radius: 50%;
-            background: #111; border: 4px solid #222;
-            display: flex; justify-content: center; align-items: center;
-            animation: spin 8s linear infinite;
-            animation-play-state: paused;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-        .vinyl-container.playing { animation-play-state: running; }
-        .vinyl-center {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: url('https://avatars.githubusercontent.com/AinulStore') center/cover;
-            border: 2px solid #000;
-        }
-        .audio-controls { flex: 1; margin-left: 30px; }
-        .song-title { font-family: 'Outfit'; font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; }
-        .song-artist { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; }
-        
-        .play-btn {
-            background: white; color: black; border: none;
-            width: 50px; height: 50px; border-radius: 50%;
-            font-size: 1.2rem; display: flex; justify-content: center; align-items: center;
-            transition: var(--transition);
-        }
-        .play-btn:hover { transform: scale(1.1); background: #eee; }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* === CARD 6: MARQUEE SKILLS === */
-        .marquee-card {
-            padding: 0; justify-content: center; border-radius: var(--radius-md);
-        }
-        .marquee {
-            width: 100%; overflow: hidden; white-space: nowrap; display: flex; align-items: center;
-        }
-        .marquee-content {
-            display: flex; gap: 40px; animation: scroll 15s linear infinite;
-        }
-        .marquee-content span {
-            font-family: 'Outfit'; font-size: 2.5rem; font-weight: 700;
-            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4);
-            transition: var(--transition);
-        }
-        .marquee-content span:hover { color: white; -webkit-text-stroke: 0px; }
-
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* === RESPONSIVE === */
-        @media (max-width: 1024px) {
-            .bento-grid { grid-template-columns: repeat(2, 1fr); }
-            .span-4x05 { grid-column: span 2; }
-        }
-        @media (max-width: 600px) {
-            .bento-grid { grid-template-columns: 1fr; }
-            .span-2x2, .span-2x1, .span-4x05 { grid-column: span 1; }
-            .bio-grid-info { grid-template-columns: 1fr; }
-            .audio-card { flex-direction: column; text-align: center; }
-            .audio-controls { margin-left: 0; margin-top: 20px; display: flex; flex-direction: column; align-items: center;}
+        /* RESPONSIVE */
+        @media(max-width: 900px) {
+            .dashboard { display: flex; flex-direction: column; overflow-y: auto; pointer-events: auto;}
+            body { overflow: auto; }
+            .left-panel, .right-panel, .bottom-console { width: 100%; }
+            .center-panel { margin: 40px 0; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Loader -->
-    <div class="loader-wrapper" id="loader">
-        <div class="loader-content" id="loader-text">0%</div>
-    </div>
+    <!-- Neural Network Canvas -->
+    <canvas id="neuralCanvas"></canvas>
+    
+    <!-- Scanline Overlay -->
+    <div class="overlay"></div>
 
-    <!-- Custom Cursor -->
-    <div class="cursor-dot" id="cursor-dot"></div>
-    <div class="cursor-outline" id="cursor-outline"></div>
+    <audio id="bgm" src="https://github.com/Chandra-XD/cn-grabbed-result/raw/main/sound/Soegi%20Bornean%20Asmalibrasi.mp3" loop autoplay></audio>
 
-    <!-- Mesh Gradient BG -->
-    <div class="mesh-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
-
-    <!-- Hidden Audio Tag -->
-    <audio id="myAudio" src="https://github.com/Chandra-XD/cn-grabbed-result/raw/main/sound/Soegi%20Bornean%20Asmalibrasi.mp3" loop></audio>
-
-    <main>
-        <div class="bento-grid">
-            
-            <!-- 1. HERO PROFILE CARD -->
-            <div class="bento-card hero-card span-2x2 magnetic" data-strength="10">
-                <div class="hero-header">
-                    <img src="https://avatars.githubusercontent.com/AinulStore" alt="Ainul Riskian" class="hero-avatar">
-                    <div class="status-badge">
-                        <div class="status-dot"></div> Available for Work
-                    </div>
-                </div>
-                <div class="hero-content">
-                    <p id="dynamic-greeting">Good Evening,</p>
-                    <h1>I'm Ainul Riskian.</h1>
-                    <p>Lead Developer & Founder of Null Store. Designing and building premium digital experiences from South Kalimantan.</p>
-                </div>
-            </div>
-
-            <!-- 2. TIME / LOCATION CARD -->
-            <div class="bento-card info-card span-1x1 magnetic" data-strength="15">
-                <h3>Local Time</h3>
-                <h2 id="real-time">00:00</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;"><i class="fas fa-map-marker-alt"></i> Banjarmasin, ID</p>
-            </div>
-
-            <!-- 3. CURRENT FOCUS -->
-            <div class="bento-card info-card span-1x1 magnetic" data-strength="15">
-                <h3>Currently building</h3>
-                <h2>Null Store</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;">Premium Game Top-up</p>
-            </div>
-
-            <!-- 4. INSTAGRAM BUTTON -->
-            <!-- ISI LINK INSTAGRAM KAMU DI HREF -->
-            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);" data-strength="20">
-                <i class="fab fa-instagram"></i>
-                <div class="social-name">Instagram</div>
-            </a>
-
-            <!-- 5. WHATSAPP BUTTON -->
-            <!-- ISI LINK WA KAMU DI HREF -->
-            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: #25D366;" data-strength="20">
-                <i class="fab fa-whatsapp"></i>
-                <div class="social-name">WhatsApp</div>
-            </a>
-
-            <!-- 6. ABOUT ME / BIO -->
-            <div class="bento-card bio-card span-2x2 magnetic" data-strength="5">
-                <h2 class="bio-title">Behind the Code</h2>
-                <p class="bio-text">I bridge the gap between design and engineering. With expertise in building automation bots, REST APIs, and elegant user interfaces, I focus on crafting scalable architecture with pixel-perfect precision.</p>
-                
-                <div class="bio-grid-info">
-                    <div class="bio-item">
-                        <span class="bio-label">Age</span>
-                        <span class="bio-value">18 Years Old</span>
-                    </div>
-                    <div class="bio-item">
-                        <span class="bio-label">Stack</span>
-                        <span class="bio-value">Fullstack Web & Bot</span>
-                    </div>
-                    <div class="bio-item">
-                        <span class="bio-label">Hobbies</span>
-                        <span class="bio-value">Coding & Singing</span>
-                    </div>
-                    <div class="bio-item">
-                        <span class="bio-label">Status</span>
-                        <span class="bio-value">Solo Player 👑</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 7. CUSTOM AUDIO PLAYER -->
-            <div class="bento-card audio-card span-2x1 magnetic" data-strength="10">
-                <div class="vinyl-container" id="vinyl">
-                    <div class="vinyl-center"></div>
-                </div>
-                <div class="audio-controls">
-                    <div class="song-title">Asmalibrasi</div>
-                    <div class="song-artist">Soegi Bornean</div>
-                    <button class="play-btn" id="playBtn">
-                        <i class="fas fa-play" id="playIcon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 8. INFINITE MARQUEE SKILLS -->
-            <div class="bento-card marquee-card span-4x05">
-                <div class="marquee">
-                    <div class="marquee-content">
-                        <span>JAVASCRIPT</span> <span>•</span>
-                        <span>NODE.JS</span> <span>•</span>
-                        <span>REACT</span> <span>•</span>
-                        <span>UI/UX DESIGN</span> <span>•</span>
-                        <span>WHATSAPP API</span> <span>•</span>
-                        <span>PYTHON</span> <span>•</span>
-                        <span>HTML/CSS</span> <span>•</span>
-                        <!-- Duplicate for infinite effect -->
-                        <span>JAVASCRIPT</span> <span>•</span>
-                        <span>NODE.JS</span> <span>•</span>
-                        <span>REACT</span> <span>•</span>
-                        <span>UI/UX DESIGN</span> <span>•</span>
-                        <span>WHATSAPP API</span> <span>•</span>
-                        <span>PYTHON</span> <span>•</span>
-                        <span>HTML/CSS</span> <span>•</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 9. TIKTOK BUTTON -->
-            <!-- ISI LINK TIKTOK KAMU DI HREF -->
-            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: #000000; border-color: #333;" data-strength="20">
-                <i class="fab fa-tiktok"></i>
-                <div class="social-name">TikTok</div>
-            </a>
-
-            <!-- 10. GROUP BUTTON -->
-            <!-- ISI LINK GRUP KAMU DI HREF -->
-            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: #333333;" data-strength="20">
-                <i class="fas fa-users"></i>
-                <div class="social-name">Group Mabar</div>
-            </a>
-
+    <!-- DASHBOARD HUD -->
+    <div class="dashboard">
+        
+        <!-- TOP -->
+        <div class="hud-panel top-bar">
+            <div style="font-family: 'Share Tech Mono';">SYS.CORE.V5 // AINULTZY</div>
+            <div class="sys-warning" id="status-text">SYSTEM ONLINE</div>
+            <div style="font-family: 'Share Tech Mono';" id="clock">00:00:00</div>
         </div>
-    </main>
+
+        <!-- LEFT -->
+        <div class="left-panel">
+            <div class="hud-panel">
+                <div class="panel-title">LIVE_TELEMETRY</div>
+                <div class="metric">
+                    <div class="metric-label"><span>CPU_LOAD</span> <span id="cpu-val">0%</span></div>
+                    <div class="metric-bar-bg"><div class="metric-bar-fill" id="cpu-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label"><span>RAM_USAGE</span> <span id="ram-val">0%</span></div>
+                    <div class="metric-bar-bg"><div class="metric-bar-fill" id="ram-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label"><span>NET_UPLINK</span> <span id="net-val">0%</span></div>
+                    <div class="metric-bar-bg"><div class="metric-bar-fill" id="net-bar" style="width: 0%;"></div></div>
+                </div>
+            </div>
+
+            <div class="hud-panel" style="flex: 1;">
+                <div class="panel-title">SKILL_MATRIX</div>
+                <div class="bio-data">
+                    > JAVASCRIPT_ES6+ <span>[ACTIVE]</span><br>
+                    > NODE.JS_RUNTIME <span>[ACTIVE]</span><br>
+                    > WHATSAPP_API <span>[MASTERED]</span><br>
+                    > REACT_FRONTEND <span>[STABLE]</span><br>
+                    > PYTHON_ML <span>[LEARNING]</span><br>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER -->
+        <div class="hud-panel center-panel">
+            <div class="core-ring">
+                <img src="https://avatars.githubusercontent.com/AinulStore" alt="Ainul" class="core-avatar">
+            </div>
+            <div class="glitch-name" id="cipher-name" data-value="AINUL RISKIAN">-------------</div>
+            <div class="designation">LEAD ENGINEER // NULL_STORE</div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right-panel">
+            <div class="hud-panel">
+                <div class="panel-title">ENTITY_DATA</div>
+                <div class="bio-data">
+                    ID_NAME: <span>Ainul Riskian</span><br>
+                    ALIAS: <span>AinulTzy / Null</span><br>
+                    AGE: <span>18 Cycles</span><br>
+                    LOC: <span>Banjarmasin, ID</span><br>
+                    ROLE: <span>Programmer</span><br>
+                    STAT: <span>Single_Entity</span><br>
+                </div>
+            </div>
+
+            <div class="hud-panel">
+                <div class="panel-title">EXTERNAL_LINKS</div>
+                <div class="action-btns">
+                    <!-- GANTI LINK DI SINI -->
+                    <a href="#" target="_blank" class="hud-btn"><span><i class="fab fa-whatsapp"></i> COMM_LINK</span> <i class="fas fa-chevron-right"></i></a>
+                    <a href="#" target="_blank" class="hud-btn"><span><i class="fab fa-instagram"></i> INSTAGRAM</span> <i class="fas fa-chevron-right"></i></a>
+                    <a href="#" target="_blank" class="hud-btn"><span><i class="fab fa-tiktok"></i> TIKTOK_NET</span> <i class="fas fa-chevron-right"></i></a>
+                    <a href="#" target="_blank" class="hud-btn" onclick="document.getElementById('bgm').play()"><span><i class="fas fa-music"></i> PLAY_BGM</span> <i class="fas fa-play"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM CONSOLE -->
+        <div class="bottom-console" id="console-output">
+            <div class="console-line"><span>[SYSTEM]</span> Initializing neural network parameters...</div>
+            <div class="console-line"><span>[SYSTEM]</span> Establishing connection to mainframe...</div>
+            <div class="console-line"><span>[SYSTEM]</span> Awaiting user interaction...</div>
+        </div>
+
+    </div>
 
     <script>
-        /* === 1. PRELOADER === */
-        document.addEventListener("DOMContentLoaded", () => {
-            let count = 0;
-            const loaderText = document.getElementById("loader-text");
-            const loader = document.getElementById("loader");
-            
-            let interval = setInterval(() => {
-                count += Math.floor(Math.random() * 10) + 1;
-                if(count >= 100) {
-                    count = 100;
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        loader.style.opacity = "0";
-                        loader.style.visibility = "hidden";
-                    }, 500);
-                }
-                loaderText.innerText = count + "%";
-            }, 50);
-        });
-
-        /* === 2. CUSTOM CURSOR === */
-        const cursorDot = document.getElementById('cursor-dot');
-        const cursorOutline = document.getElementById('cursor-outline');
+        /* ==================================================================
+           1. ADVANCED NEURAL NETWORK CANVAS (Math & Physics Heavy)
+           ================================================================== */
+        const canvas = document.getElementById('neuralCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        
+        const mouse = { x: null, y: null, radius: 150 };
 
         window.addEventListener('mousemove', (e) => {
-            const posX = e.clientX;
-            const posY = e.clientY;
-
-            cursorDot.style.left = `${posX}px`;
-            cursorDot.style.top = `${posY}px`;
-
-            // Adding a slight delay for the outline for smoothness
-            cursorOutline.animate({
-                left: `${posX}px`,
-                top: `${posY}px`
-            }, { duration: 150, fill: "forwards" });
+            mouse.x = e.x;
+            mouse.y = e.y;
         });
 
-        // Hover effect for buttons/links
-        const interactables = document.querySelectorAll('a, button, .bento-card');
-        interactables.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorOutline.style.width = '60px';
-                cursorOutline.style.height = '60px';
-                cursorOutline.style.backgroundColor = 'rgba(255,255,255,0.1)';
-            });
-            el.addEventListener('mouseleave', () => {
-                cursorOutline.style.width = '40px';
-                cursorOutline.style.height = '40px';
-                cursorOutline.style.backgroundColor = 'transparent';
-            });
+        window.addEventListener('mouseout', () => {
+            mouse.x = undefined;
+            mouse.y = undefined;
         });
 
-        /* === 3. DYNAMIC TIME & GREETING === */
-        function updateTime() {
-            const timeElement = document.getElementById("real-time");
-            const greetingElement = document.getElementById("dynamic-greeting");
-            
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            
-            // Format time
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            timeElement.innerText = `${hours}:${minutes} WITA`;
-
-            // Dynamic Greeting
-            let greeting = "Good Evening,";
-            if (hours >= 5 && hours < 12) greeting = "Good Morning,";
-            else if (hours >= 12 && hours < 18) greeting = "Good Afternoon,";
-            greetingElement.innerText = greeting;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         }
-        setInterval(updateTime, 1000);
-        updateTime();
+        window.addEventListener('resize', resize);
+        resize();
 
-        /* === 4. CUSTOM AUDIO PLAYER === */
-        const audio = document.getElementById("myAudio");
-        const playBtn = document.getElementById("playBtn");
-        const playIcon = document.getElementById("playIcon");
-        const vinyl = document.getElementById("vinyl");
-
-        playBtn.addEventListener("click", () => {
-            if(audio.paused) {
-                audio.play();
-                playIcon.classList.remove("fa-play");
-                playIcon.classList.add("fa-pause");
-                vinyl.classList.add("playing");
-            } else {
-                audio.pause();
-                playIcon.classList.remove("fa-pause");
-                playIcon.classList.add("fa-play");
-                vinyl.classList.remove("playing");
+        class Particle {
+            constructor(x, y, vx, vy, size) {
+                this.x = x; this.y = y;
+                this.vx = vx; this.vy = vy;
+                this.size = size;
+                this.baseX = this.x; this.baseY = this.y;
             }
-        });
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#00f2fe';
+                ctx.fill();
+            }
+            update() {
+                // Constellation movement
+                this.x += this.vx;
+                this.y += this.vy;
 
-        /* === 5. MAGNETIC EFFECT (JS PURE) === */
-        const magnetics = document.querySelectorAll('.magnetic');
+                // Bounce off edges
+                if(this.x < 0 || this.x > width) this.vx = -this.vx;
+                if(this.y < 0 || this.y > height) this.vy = -this.vy;
+
+                // Mouse interaction (Repulsion Physics)
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < mouse.radius) {
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    const force = (mouse.radius - distance) / mouse.radius;
+                    const directionX = forceDirectionX * force * 5;
+                    const directionY = forceDirectionY * force * 5;
+                    
+                    this.x -= directionX;
+                    this.y -= directionY;
+                }
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let numberOfParticles = (width * height) / 9000; // Density
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = Math.random() * width;
+                let y = Math.random() * height;
+                let vx = (Math.random() - 0.5) * 1;
+                let vy = (Math.random() - 0.5) * 1;
+                particles.push(new Particle(x, y, vx, vy, size));
+            }
+        }
+
+        function connectParticles() {
+            let opacityValue = 1;
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 120) {
+                        opacityValue = 1 - (distance / 120);
+                        ctx.strokeStyle = `rgba(0, 242, 254, ${opacityValue * 0.5})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateCanvas() {
+            requestAnimationFrame(animateCanvas);
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+            }
+            connectParticles();
+        }
+
+        initParticles();
+        animateCanvas();
+
+        /* ==================================================================
+           2. HACKER CIPHER TEXT DECRYPTION EFFECT
+           ================================================================== */
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+        let targetElement = document.getElementById("cipher-name");
         
-        magnetics.forEach(magnet => {
-            magnet.addEventListener('mousemove', function(e) {
-                const position = magnet.getBoundingClientRect();
-                const x = e.pageX - position.left - position.width / 2;
-                const y = e.pageY - position.top - position.height / 2;
+        targetElement.onmouseover = event => {
+            let iterations = 0;
+            const interval = setInterval(() => {
+                event.target.innerText = event.target.innerText.split("")
+                .map((letter, index) => {
+                    if(index < iterations) return event.target.dataset.value[index];
+                    return letters[Math.floor(Math.random() * 42)]
+                }).join("");
                 
-                // Get strength from data attribute or default to 10
-                const strength = magnet.getAttribute('data-strength') || 10;
-                
-                magnet.style.transform = `translate(${x / strength}px, ${y / strength}px)`;
-            });
+                if(iterations >= event.target.dataset.value.length) clearInterval(interval);
+                iterations += 1 / 3;
+            }, 30);
+        }
 
-            magnet.addEventListener('mouseout', function() {
-                magnet.style.transform = `translate(0px, 0px)`;
-            });
-        });
+        // Auto trigger on load
+        setTimeout(() => {
+            let event = new MouseEvent('mouseover');
+            targetElement.dispatchEvent(event);
+        }, 1000);
+
+        /* ==================================================================
+           3. FAKE LIVE TELEMETRY & CLOCK
+           ================================================================== */
+        function updateTelemetry() {
+            // CPU
+            let cpu = Math.floor(Math.random() * 30) + 20; // 20-50%
+            if(Math.random() > 0.9) cpu += 40; // Random spike
+            document.getElementById('cpu-val').innerText = cpu + '%';
+            document.getElementById('cpu-bar').style.width = cpu + '%';
+            document.getElementById('cpu-bar').style.background = cpu > 80 ? 'var(--alert)' : 'var(--primary)';
+
+            // RAM
+            let ram = Math.floor(Math.random() * 10) + 60; // 60-70%
+            document.getElementById('ram-val').innerText = ram + '%';
+            document.getElementById('ram-bar').style.width = ram + '%';
+
+            // NET
+            let net = Math.floor(Math.random() * 100);
+            document.getElementById('net-val').innerText = net + ' Mbps';
+            document.getElementById('net-bar').style.width = net + '%';
+        }
+        setInterval(updateTelemetry, 1500);
+
+        // CLOCK
+        setInterval(() => {
+            let d = new Date();
+            document.getElementById('clock').innerText = 
+                ("0" + d.getHours()).slice(-2) + ":" + 
+                ("0" + d.getMinutes()).slice(-2) + ":" + 
+                ("0" + d.getSeconds()).slice(-2);
+        }, 1000);
+
+        /* ==================================================================
+           4. FAKE CONSOLE LOGGING
+           ================================================================== */
+        const consoleMsgs = [
+            "Compiling WebAssembly modules...",
+            "Decrypting payload [AinulTzy_Data]...",
+            "Bypassing proxy server...",
+            "Ping node 192.168.1.1: SUCCESS",
+            "Audio engine initialized.",
+            "Visual render at 60fps.",
+            "Awaiting command input..."
+        ];
+        let consoleBox = document.getElementById("console-output");
+        
+        let msgIndex = 0;
+        setInterval(() => {
+            if(Math.random() > 0.6) {
+                let msg = consoleMsgs[Math.floor(Math.random() * consoleMsgs.length)];
+                let id = Math.floor(Math.random() * 9999);
+                consoleBox.innerHTML += `<div class="console-line"><span>[SYS_${id}]</span> ${msg}</div>`;
+                
+                // Keep only last 4 lines
+                if(consoleBox.children.length > 4) {
+                    consoleBox.removeChild(consoleBox.firstChild);
+                }
+            }
+        }, 2000);
 
     </script>
 </body>
