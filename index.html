@@ -1,520 +1,554 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AinulTzy // Mainframe Access</title>
+    <title>Ainul Riskian | Premium Portfolio</title>
     
-    <!-- Fonts: Share Tech Mono (Hacker Vibe) & Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
+    <!-- Ultra Premium Fonts: Plus Jakarta Sans & Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* === GLOBAL RESET & VARIABLES === */
         :root {
-            --cyber-green: #0f0;
-            --cyber-cyan: #0ff;
-            --cyber-dark: #050505;
-            --glass-bg: rgba(10, 20, 15, 0.6);
+            --bg-color: #050505;
+            --surface-color: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #8a8a93;
+            --accent: #ffffff;
+            --radius-lg: 32px;
+            --radius-md: 24px;
+            --radius-sm: 16px;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            cursor: crosshair; /* Custom cursor */
+            cursor: none; /* Hide default cursor for custom one */
         }
 
         body {
-            background-color: var(--cyber-dark);
-            color: var(--cyber-green);
-            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 1. BACKGROUND CANVAS */
-        #matrixCanvas {
+        /* === MESH GRADIENT BACKGROUND === */
+        .mesh-bg {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: -2;
-            opacity: 0.3;
-        }
-
-        /* 2. SCANLINE EFFECT */
-        .scanlines {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 4px;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: -1;
+            background-color: #000;
+            overflow: hidden;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.6;
+            animation: moveBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .blob-1 { width: 600px; height: 600px; background: #1a365d; top: -200px; left: -100px; }
+        .blob-2 { width: 500px; height: 500px; background: #2d3748; bottom: -100px; right: -100px; animation-delay: -5s; }
+        .blob-3 { width: 400px; height: 400px; background: #0f4c75; top: 30%; left: 40%; animation-delay: -10s; }
+
+        @keyframes moveBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 150px) scale(1.2); }
+        }
+
+        /* === CUSTOM CURSOR === */
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background-color: var(--accent);
+            position: fixed; top: 0; left: 0;
+            border-radius: 50%; z-index: 9999;
             pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-outline {
+            width: 40px; height: 40px;
+            border: 1px solid rgba(255,255,255,0.5);
+            position: fixed; top: 0; left: 0;
+            border-radius: 50%; z-index: 9998;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
         }
 
-        /* 3. BOOT SCREEN */
-        #boot-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: black;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            font-size: 1.2rem;
-            color: var(--cyber-green);
-            text-shadow: 0 0 5px var(--cyber-green);
+        /* === LOADER === */
+        .loader-wrapper {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-color); z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .loader-content {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem; font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .hidden {
-            display: none !important;
-        }
-
-        /* 4. MAIN LAYOUT */
-        #main-ui {
-            max-width: 900px;
+        /* === MAIN CONTAINER & BENTO GRID === */
+        main {
+            padding: 5vh 5vw;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
             opacity: 0;
-            animation: systemOnline 2s forwards;
-            animation-delay: 3s; /* Waits for boot screen */
+            transform: translateY(40px);
+            animation: revealMain 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 2s;
         }
 
-        @keyframes systemOnline {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        @keyframes revealMain {
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 5. GLITCH PROFILE HEADER */
-        .header-cyber {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            background: var(--glass-bg);
-            border: 1px solid var(--cyber-green);
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2), inset 0 0 10px rgba(0, 255, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-            flex-wrap: wrap;
-        }
-
-        .header-cyber::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent);
-            animation: cyberSweep 4s infinite;
-        }
-
-        @keyframes cyberSweep {
-            0% { left: -100%; }
-            50% { left: 200%; }
-            100% { left: 200%; }
-        }
-
-        .avatar-container {
-            width: 120px;
-            height: 120px;
-            position: relative;
-        }
-
-        .avatar-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid var(--cyber-cyan);
-            filter: sepia(100%) hue-rotate(130deg) saturate(300%);
-        }
-
-        .glitch-text {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 2px 0 var(--cyber-cyan), -2px 0 magenta;
-            position: relative;
-            animation: glitchEffect 3s infinite;
-        }
-
-        @keyframes glitchEffect {
-            0% { transform: translate(0) }
-            2% { transform: translate(-3px, 2px) }
-            4% { transform: translate(3px, -2px) }
-            6% { transform: translate(0) }
-            100% { transform: translate(0) }
-        }
-
-        /* 6. GRID SYSTEM FOR WIDGETS */
-        .cyber-grid {
+        .bento-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 200px;
+            gap: 24px;
         }
 
-        .cyber-panel {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--cyber-green);
-            padding: 20px;
-            border-top: 4px solid var(--cyber-cyan);
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .cyber-panel:hover {
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-            transform: translateY(-5px);
-        }
-
-        .panel-title {
-            font-size: 1.2rem;
-            color: var(--cyber-cyan);
-            border-bottom: 1px dashed var(--cyber-green);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        /* 7. BIODATA (KEY-VALUE) */
-        .bio-line {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
-        }
-        .bio-key { color: #888; }
-        .bio-val { color: #fff; text-align: right; }
-
-        /* 8. SKILL BARS */
-        .skill-item {
-            margin-bottom: 15px;
-        }
-        .skill-name {
-            font-size: 0.85rem;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .skill-bar-bg {
-            width: 100%;
-            height: 6px;
-            background: #222;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .skill-bar-fill {
-            height: 100%;
-            background: var(--cyber-cyan);
-            box-shadow: 0 0 10px var(--cyber-cyan);
-        }
-
-        /* 9. SOCIAL LINKS (HEXAGONAL VIBE) */
-        .links-wrapper {
+        /* BENTO CARDS BASE */
+        .bento-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-        .cyber-btn {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: transparent;
-            color: var(--cyber-green);
-            text-decoration: none;
-            padding: 12px 20px;
-            border: 1px solid var(--cyber-green);
-            font-family: 'Share Tech Mono';
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
             position: relative;
-        }
-        .cyber-btn::after {
-            content: ']';
-            position: absolute;
-            right: 20px;
-            opacity: 0;
-            transition: 0.3s;
-        }
-        .cyber-btn::before {
-            content: '[';
-            position: absolute;
-            left: 20px;
-            opacity: 0;
-            transition: 0.3s;
-        }
-        .cyber-btn:hover {
-            background: var(--cyber-green);
-            color: #000;
-            padding-left: 35px;
-        }
-        .cyber-btn:hover::after, .cyber-btn:hover::before {
-            opacity: 1;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: var(--transition);
         }
 
-        /* 10. INTERACTIVE TERMINAL */
-        #terminal-panel {
-            grid-column: 1 / -1;
-            background: #000;
-            padding: 20px;
-            border: 1px solid #333;
-            height: 250px;
-            overflow-y: auto;
-            font-size: 0.9rem;
+        .bento-card:hover {
+            border-color: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
-        .term-output { margin-bottom: 10px; color: #aaa; }
-        .term-input-line { display: flex; color: var(--cyber-cyan); }
-        .term-input-line input {
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-family: 'Share Tech Mono';
-            font-size: 0.9rem;
-            width: 100%;
-            margin-left: 10px;
-            outline: none;
+
+        /* GRID SIZES */
+        .span-2x2 { grid-column: span 2; grid-row: span 2; }
+        .span-2x1 { grid-column: span 2; grid-row: span 1; }
+        .span-1x1 { grid-column: span 1; grid-row: span 1; }
+        .span-4x05 { grid-column: span 4; grid-row: span 1; height: 100px; }
+
+        /* === CARD 1: PROFILE HERO === */
+        .hero-card {
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
         }
+        .hero-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .hero-avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .status-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 500;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .status-dot {
+            width: 8px; height: 8px; background: #4ADE80;
+            border-radius: 50%; box-shadow: 0 0 10px #4ADE80;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
         
-        /* SCROLLBAR CYBER */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--cyber-green); }
+        .hero-content h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem; font-weight: 600; line-height: 1.1;
+            margin-bottom: 8px;
+        }
+        .hero-content p {
+            color: var(--text-secondary); font-size: 1.1rem;
+        }
 
+        /* === CARD 2: DYNAMIC INFO === */
+        .info-card { justify-content: center; align-items: flex-start; }
+        .info-card h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 5px; font-weight: 500;}
+        .info-card h2 { font-size: 1.8rem; font-family: 'Outfit'; font-weight: 500; }
+
+        /* === CARD 3: SOCIAL LINKS === */
+        .social-card {
+            justify-content: center; align-items: center;
+            text-decoration: none; color: white;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .social-card i { z-index: 2; transition: var(--transition); }
+        .social-card .social-name {
+            font-size: 1rem; font-weight: 600; margin-top: 10px;
+            opacity: 0; transform: translateY(20px); transition: var(--transition); z-index: 2;
+        }
+        .social-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0; transition: var(--transition);
+        }
+        .social-card:hover i { transform: translateY(-10px); }
+        .social-card:hover .social-name { opacity: 1; transform: translateY(0); }
+        .social-card:hover::before { opacity: 1; }
+
+        /* === CARD 4: ABOUT ME / BIO === */
+        .bio-card { padding: 40px; }
+        .bio-title { font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 20px; font-weight: 600;}
+        .bio-text { color: var(--text-secondary); line-height: 1.7; font-size: 1.05rem; margin-bottom: 20px;}
+        .bio-grid-info {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            font-size: 0.95rem;
+        }
+        .bio-item { display: flex; flex-direction: column; }
+        .bio-label { color: #555; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;}
+        .bio-value { font-weight: 500; }
+
+        /* === CARD 5: AUDIO PLAYER === */
+        .audio-card {
+            display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+            padding: 30px;
+        }
+        .vinyl-container {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: #111; border: 4px solid #222;
+            display: flex; justify-content: center; align-items: center;
+            animation: spin 8s linear infinite;
+            animation-play-state: paused;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .vinyl-container.playing { animation-play-state: running; }
+        .vinyl-center {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: url('https://avatars.githubusercontent.com/AinulStore') center/cover;
+            border: 2px solid #000;
+        }
+        .audio-controls { flex: 1; margin-left: 30px; }
+        .song-title { font-family: 'Outfit'; font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; }
+        .song-artist { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; }
+        
+        .play-btn {
+            background: white; color: black; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.2rem; display: flex; justify-content: center; align-items: center;
+            transition: var(--transition);
+        }
+        .play-btn:hover { transform: scale(1.1); background: #eee; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* === CARD 6: MARQUEE SKILLS === */
+        .marquee-card {
+            padding: 0; justify-content: center; border-radius: var(--radius-md);
+        }
+        .marquee {
+            width: 100%; overflow: hidden; white-space: nowrap; display: flex; align-items: center;
+        }
+        .marquee-content {
+            display: flex; gap: 40px; animation: scroll 15s linear infinite;
+        }
+        .marquee-content span {
+            font-family: 'Outfit'; font-size: 2.5rem; font-weight: 700;
+            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4);
+            transition: var(--transition);
+        }
+        .marquee-content span:hover { color: white; -webkit-text-stroke: 0px; }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1024px) {
+            .bento-grid { grid-template-columns: repeat(2, 1fr); }
+            .span-4x05 { grid-column: span 2; }
+        }
+        @media (max-width: 600px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .span-2x2, .span-2x1, .span-4x05 { grid-column: span 1; }
+            .bio-grid-info { grid-template-columns: 1fr; }
+            .audio-card { flex-direction: column; text-align: center; }
+            .audio-controls { margin-left: 0; margin-top: 20px; display: flex; flex-direction: column; align-items: center;}
+        }
     </style>
 </head>
 <body>
 
-    <!-- Fake OS Boot Screen -->
-    <div id="boot-screen">
-        <div id="boot-text"></div>
+    <!-- Loader -->
+    <div class="loader-wrapper" id="loader">
+        <div class="loader-content" id="loader-text">0%</div>
     </div>
 
-    <!-- Scanline Overlay -->
-    <div class="scanlines"></div>
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
 
-    <!-- Interactive Background Matrix -->
-    <canvas id="matrixCanvas"></canvas>
+    <!-- Mesh Gradient BG -->
+    <div class="mesh-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
-    <!-- MAIN UI INTERFACE -->
-    <div id="main-ui" class="hidden">
-        
-        <!-- HEADER PROFILE -->
-        <header class="header-cyber" data-tilt data-tilt-max="5" data-tilt-speed="400">
-            <div class="avatar-container">
-                <img src="https://avatars.githubusercontent.com/AinulStore" alt="Hacker Profile">
-            </div>
-            <div>
-                <div style="color: var(--cyber-green); margin-bottom: 5px;">> USER AUTHENTICATED</div>
-                <div class="glitch-text">AinulTzy</div>
-                <div style="color: #aaa; font-family: 'Poppins'; font-size: 0.9rem; margin-top: 5px;">
-                    <i class="fas fa-code-branch"></i> Lead Software Engineer // Web3 Enthusiast
-                </div>
-            </div>
-        </header>
+    <!-- Hidden Audio Tag -->
+    <audio id="myAudio" src="https://github.com/Chandra-XD/cn-grabbed-result/raw/main/sound/Soegi%20Bornean%20Asmalibrasi.mp3" loop></audio>
 
-        <div class="cyber-grid">
+    <main>
+        <div class="bento-grid">
             
-            <!-- BIODATA PANEL -->
-            <div class="cyber-panel">
-                <div class="panel-title">> SYS.INFO_BIODATA</div>
-                <div class="bio-line">
-                    <span class="bio-key">ID.Name</span>
-                    <span class="bio-val">Ainul Riskian</span>
+            <!-- 1. HERO PROFILE CARD -->
+            <div class="bento-card hero-card span-2x2 magnetic" data-strength="10">
+                <div class="hero-header">
+                    <img src="https://avatars.githubusercontent.com/AinulStore" alt="Ainul Riskian" class="hero-avatar">
+                    <div class="status-badge">
+                        <div class="status-dot"></div> Available for Work
+                    </div>
                 </div>
-                <div class="bio-line">
-                    <span class="bio-key">Codename</span>
-                    <span class="bio-val">Null</span>
-                </div>
-                <div class="bio-line">
-                    <span class="bio-key">Uptime (Age)</span>
-                    <span class="bio-val">18 Cycles</span>
-                </div>
-                <div class="bio-line">
-                    <span class="bio-key">Base_Location</span>
-                    <span class="bio-val">Banjarmasin, ID</span>
-                </div>
-                <div class="bio-line">
-                    <span class="bio-key">Primary_Role</span>
-                    <span class="bio-val">Programmer</span>
-                </div>
-                <div class="bio-line">
-                    <span class="bio-key">Logic_Status</span>
-                    <span class="bio-val" style="color: var(--cyber-cyan);">Jomblo dari lahir // Error 404</span>
+                <div class="hero-content">
+                    <p id="dynamic-greeting">Good Evening,</p>
+                    <h1>I'm Ainul Riskian.</h1>
+                    <p>Lead Developer & Founder of Null Store. Designing and building premium digital experiences from South Kalimantan.</p>
                 </div>
             </div>
 
-            <!-- SKILLS PANEL -->
-            <div class="cyber-panel">
-                <div class="panel-title">> TECH_STACK.EXE</div>
+            <!-- 2. TIME / LOCATION CARD -->
+            <div class="bento-card info-card span-1x1 magnetic" data-strength="15">
+                <h3>Local Time</h3>
+                <h2 id="real-time">00:00</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;"><i class="fas fa-map-marker-alt"></i> Banjarmasin, ID</p>
+            </div>
+
+            <!-- 3. CURRENT FOCUS -->
+            <div class="bento-card info-card span-1x1 magnetic" data-strength="15">
+                <h3>Currently building</h3>
+                <h2>Null Store</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;">Premium Game Top-up</p>
+            </div>
+
+            <!-- 4. INSTAGRAM BUTTON -->
+            <!-- ISI LINK INSTAGRAM KAMU DI HREF -->
+            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);" data-strength="20">
+                <i class="fab fa-instagram"></i>
+                <div class="social-name">Instagram</div>
+            </a>
+
+            <!-- 5. WHATSAPP BUTTON -->
+            <!-- ISI LINK WA KAMU DI HREF -->
+            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: #25D366;" data-strength="20">
+                <i class="fab fa-whatsapp"></i>
+                <div class="social-name">WhatsApp</div>
+            </a>
+
+            <!-- 6. ABOUT ME / BIO -->
+            <div class="bento-card bio-card span-2x2 magnetic" data-strength="5">
+                <h2 class="bio-title">Behind the Code</h2>
+                <p class="bio-text">I bridge the gap between design and engineering. With expertise in building automation bots, REST APIs, and elegant user interfaces, I focus on crafting scalable architecture with pixel-perfect precision.</p>
                 
-                <div class="skill-item">
-                    <div class="skill-name"><span>Frontend (HTML/CSS/JS)</span> <span>95%</span></div>
-                    <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 95%;"></div></div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name"><span>Backend (Node.js/PHP)</span> <span>88%</span></div>
-                    <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 88%;"></div></div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name"><span>Bot Dev (WhatsApp API)</span> <span>98%</span></div>
-                    <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 98%;"></div></div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name"><span>Cyber Security Basics</span> <span>75%</span></div>
-                    <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 75%;"></div></div>
+                <div class="bio-grid-info">
+                    <div class="bio-item">
+                        <span class="bio-label">Age</span>
+                        <span class="bio-value">18 Years Old</span>
+                    </div>
+                    <div class="bio-item">
+                        <span class="bio-label">Stack</span>
+                        <span class="bio-value">Fullstack Web & Bot</span>
+                    </div>
+                    <div class="bio-item">
+                        <span class="bio-label">Hobbies</span>
+                        <span class="bio-value">Coding & Singing</span>
+                    </div>
+                    <div class="bio-item">
+                        <span class="bio-label">Status</span>
+                        <span class="bio-value">Solo Player 👑</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- QUICK LINKS PANEL -->
-            <div class="cyber-panel">
-                <div class="panel-title">> NETWORK_LINKS</div>
-                <div class="links-wrapper">
-                    <!-- GANTI LINK DI SINI -->
-                    <a href="..." class="cyber-btn" target="_blank"><i class="fas fa-terminal"></i> WhatsApp</a>
-                    <a href="..." class="cyber-btn" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
-                    <a href="..." class="cyber-btn" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
-                    <a href="..." class="cyber-btn" target="_blank"><i class="fas fa-users"></i> Guild / Mabar</a>
+            <!-- 7. CUSTOM AUDIO PLAYER -->
+            <div class="bento-card audio-card span-2x1 magnetic" data-strength="10">
+                <div class="vinyl-container" id="vinyl">
+                    <div class="vinyl-center"></div>
+                </div>
+                <div class="audio-controls">
+                    <div class="song-title">Asmalibrasi</div>
+                    <div class="song-artist">Soegi Bornean</div>
+                    <button class="play-btn" id="playBtn">
+                        <i class="fas fa-play" id="playIcon"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- INTERACTIVE TERMINAL -->
-            <div class="cyber-panel" id="terminal-panel" onclick="document.getElementById('cmd-input').focus()">
-                <div class="panel-title" style="margin-bottom: 5px;">> ROOT@AINULTZY:~# INTERACTIVE_TERMINAL</div>
-                <div style="font-size: 0.8rem; color: #555; margin-bottom: 15px;">Type 'help' to see available commands.</div>
-                
-                <div id="term-history"></div>
-                
-                <div class="term-input-line">
-                    <span>root@ainultzy:~$</span>
-                    <input type="text" id="cmd-input" autocomplete="off" spellcheck="false">
+            <!-- 8. INFINITE MARQUEE SKILLS -->
+            <div class="bento-card marquee-card span-4x05">
+                <div class="marquee">
+                    <div class="marquee-content">
+                        <span>JAVASCRIPT</span> <span>•</span>
+                        <span>NODE.JS</span> <span>•</span>
+                        <span>REACT</span> <span>•</span>
+                        <span>UI/UX DESIGN</span> <span>•</span>
+                        <span>WHATSAPP API</span> <span>•</span>
+                        <span>PYTHON</span> <span>•</span>
+                        <span>HTML/CSS</span> <span>•</span>
+                        <!-- Duplicate for infinite effect -->
+                        <span>JAVASCRIPT</span> <span>•</span>
+                        <span>NODE.JS</span> <span>•</span>
+                        <span>REACT</span> <span>•</span>
+                        <span>UI/UX DESIGN</span> <span>•</span>
+                        <span>WHATSAPP API</span> <span>•</span>
+                        <span>PYTHON</span> <span>•</span>
+                        <span>HTML/CSS</span> <span>•</span>
+                    </div>
                 </div>
             </div>
+
+            <!-- 9. TIKTOK BUTTON -->
+            <!-- ISI LINK TIKTOK KAMU DI HREF -->
+            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: #000000; border-color: #333;" data-strength="20">
+                <i class="fab fa-tiktok"></i>
+                <div class="social-name">TikTok</div>
+            </a>
+
+            <!-- 10. GROUP BUTTON -->
+            <!-- ISI LINK GRUP KAMU DI HREF -->
+            <a href="#" target="_blank" class="bento-card social-card span-1x1 magnetic" style="background: #333333;" data-strength="20">
+                <i class="fas fa-users"></i>
+                <div class="social-name">Group Mabar</div>
+            </a>
 
         </div>
-    </div>
+    </main>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
     <script>
-        /* =========================================
-           1. BOOT SEQUENCE SCRIPT
-           ========================================= */
-        const bootText = [
-            "INITIALIZING KERNEL...",
-            "LOADING MODULES [OK]",
-            "MOUNTING VIRTUAL FILE SYSTEMS...",
-            "ESTABLISHING SECURE CONNECTION TO AINUL-MAINFRAME...",
-            "BYPASSING FIREWALL... [SUCCESS]",
-            "DECRYPTING BIODATA...",
-            "SYSTEM READY. WELCOME BACK, ADMIN."
-        ];
-        
-        let bootScreen = document.getElementById("boot-screen");
-        let bootContainer = document.getElementById("boot-text");
-        let mainUI = document.getElementById("main-ui");
-        
-        let delay = 0;
-        bootText.forEach((text, index) => {
-            setTimeout(() => {
-                bootContainer.innerHTML += `<div>> ${text}</div>`;
-                if(index === bootText.length - 1) {
+        /* === 1. PRELOADER === */
+        document.addEventListener("DOMContentLoaded", () => {
+            let count = 0;
+            const loaderText = document.getElementById("loader-text");
+            const loader = document.getElementById("loader");
+            
+            let interval = setInterval(() => {
+                count += Math.floor(Math.random() * 10) + 1;
+                if(count >= 100) {
+                    count = 100;
+                    clearInterval(interval);
                     setTimeout(() => {
-                        bootScreen.classList.add("hidden");
-                        mainUI.classList.remove("hidden");
-                    }, 1000);
+                        loader.style.opacity = "0";
+                        loader.style.visibility = "hidden";
+                    }, 500);
                 }
-            }, delay);
-            delay += 400 + Math.random() * 300; // Randomize typing speed
+                loaderText.innerText = count + "%";
+            }, 50);
         });
 
+        /* === 2. CUSTOM CURSOR === */
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
 
-        /* =========================================
-           2. INTERACTIVE TERMINAL SCRIPT
-           ========================================= */
-        const cmdInput = document.getElementById("cmd-input");
-        const termHistory = document.getElementById("term-history");
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
 
-        cmdInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                let cmd = cmdInput.value.trim().toLowerCase();
-                let output = "";
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
 
-                if (cmd === "help") {
-                    output = "Available commands: <br> - <b>whoami</b>: Show user identity<br> - <b>skills</b>: Show dev skills<br> - <b>clear</b>: Clear terminal<br> - <b>sudo hack</b>: ???";
-                } else if (cmd === "whoami") {
-                    output = "You are currently viewing the secure profile of Ainul Riskian (Null).";
-                } else if (cmd === "skills") {
-                    output = "[Node.js, React, HTML/CSS, Python, CyberSec]";
-                } else if (cmd === "sudo hack") {
-                    output = "<span style='color:red;'>ACCESS DENIED. YOU HAVE BEEN LOGGED. FBI IS ON THE WAY.</span>";
-                } else if (cmd === "clear") {
-                    termHistory.innerHTML = "";
-                    cmdInput.value = "";
-                    return;
-                } else if (cmd !== "") {
-                    output = `Command not found: ${cmd}. Type 'help' for options.`;
-                }
+            // Adding a slight delay for the outline for smoothness
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 150, fill: "forwards" });
+        });
 
-                if (cmd !== "") {
-                    termHistory.innerHTML += `<div><span style="color:var(--cyber-cyan)">root@ainultzy:~$</span> ${cmd}</div>`;
-                    if(output) termHistory.innerHTML += `<div class="term-output">${output}</div>`;
-                }
-                
-                cmdInput.value = "";
-                // Auto scroll down
-                document.getElementById("terminal-panel").scrollTop = document.getElementById("terminal-panel").scrollHeight;
+        // Hover effect for buttons/links
+        const interactables = document.querySelectorAll('a, button, .bento-card');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.width = '60px';
+                cursorOutline.style.height = '60px';
+                cursorOutline.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.backgroundColor = 'transparent';
+            });
+        });
+
+        /* === 3. DYNAMIC TIME & GREETING === */
+        function updateTime() {
+            const timeElement = document.getElementById("real-time");
+            const greetingElement = document.getElementById("dynamic-greeting");
+            
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            
+            // Format time
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            timeElement.innerText = `${hours}:${minutes} WITA`;
+
+            // Dynamic Greeting
+            let greeting = "Good Evening,";
+            if (hours >= 5 && hours < 12) greeting = "Good Morning,";
+            else if (hours >= 12 && hours < 18) greeting = "Good Afternoon,";
+            greetingElement.innerText = greeting;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        /* === 4. CUSTOM AUDIO PLAYER === */
+        const audio = document.getElementById("myAudio");
+        const playBtn = document.getElementById("playBtn");
+        const playIcon = document.getElementById("playIcon");
+        const vinyl = document.getElementById("vinyl");
+
+        playBtn.addEventListener("click", () => {
+            if(audio.paused) {
+                audio.play();
+                playIcon.classList.remove("fa-play");
+                playIcon.classList.add("fa-pause");
+                vinyl.classList.add("playing");
+            } else {
+                audio.pause();
+                playIcon.classList.remove("fa-pause");
+                playIcon.classList.add("fa-play");
+                vinyl.classList.remove("playing");
             }
         });
 
-
-        /* =========================================
-           3. MATRIX RAIN CANVAS BACKGROUND
-           ========================================= */
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
+        /* === 5. MAGNETIC EFFECT (JS PURE) === */
+        const magnetics = document.querySelectorAll('.magnetic');
         
-        const drops = [];
-        for(let x = 0; x < columns; x++) {
-            drops[x] = 1; 
-        }
-
-        function drawMatrix() {
-            // Black bg with opacity to create trail effect
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = '#0F0'; // Green text
-            ctx.font = fontSize + 'px Share Tech Mono';
-            
-            for(let i = 0; i < drops.length; i++) {
-                const text = letters.charAt(Math.floor(Math.random() * letters.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        magnetics.forEach(magnet => {
+            magnet.addEventListener('mousemove', function(e) {
+                const position = magnet.getBoundingClientRect();
+                const x = e.pageX - position.left - position.width / 2;
+                const y = e.pageY - position.top - position.height / 2;
                 
-                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-        }
-        setInterval(drawMatrix, 50);
+                // Get strength from data attribute or default to 10
+                const strength = magnet.getAttribute('data-strength') || 10;
+                
+                magnet.style.transform = `translate(${x / strength}px, ${y / strength}px)`;
+            });
 
-        // Resize Canvas dynamically
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            magnet.addEventListener('mouseout', function() {
+                magnet.style.transform = `translate(0px, 0px)`;
+            });
         });
 
     </script>
